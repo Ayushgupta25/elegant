@@ -1,0 +1,173 @@
+package dao;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import utils.HibernateUtil;
+import bean.User;
+
+public class UserDAO {
+
+	public JSONObject newUserRegister(String userName, String password, String email,
+			String phone, String currentAddress) {
+		try {
+			
+			// 3. Get Session object
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			// 4. Starting Transaction
+			Transaction transaction = session.beginTransaction();
+			
+			if(session.isConnected()){
+				User user = new User();
+				user.setUserName(userName);
+				user.setPassword(password);
+				user.setEmail(email);
+				user.setCurrentAddress(currentAddress);
+				user.setPhone(phone);
+				session.save(user);
+				transaction.commit();
+			}
+			
+			System.out.println("\n\n User registered successfully \n");
+			JSONObject responseObj = new JSONObject();
+			responseObj.put("RESPONSE_STATUS", "SUCCESS");
+			responseObj.put("RESPONSE_OBJECT", "SUCCESS");
+			return responseObj;
+		} catch (HibernateException e) {
+			System.out.println(e.getMessage());
+			System.out.println("error");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public void userLogin(String emailId, String password){
+		try {
+			
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+}
+
+
+
+
+
+package utils;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+public class HibernateUtil {
+	public static SessionFactory getSessionFactory() {
+		// 1. configuring hibernate
+		Configuration configuration = new Configuration().configure();
+
+		// 2. create sessionfactory
+		SessionFactory sessionFactory = configuration.buildSessionFactory();
+		
+		return sessionFactory;
+	}
+}
+
+
+
+
+
+
+
+
+
+package controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import sun.org.mozilla.javascript.internal.json.JsonParser;
+import dao.UserDAO;
+
+public class MainControllerServlet {
+	
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+
+		try{
+			
+			JSONObject requestObject = new JSONObject(request.getParameter("requestObject"));
+			
+			if(requestObject.getString("action").equalsIgnoreCase("newUserRegister")){
+				
+				String userName = requestObject.getString("userName");
+				String password = requestObject.getString("password");
+				String email = requestObject.getString("email");
+				String phone = requestObject.getString("phone");
+				String currentAddress = requestObject.getString("currentAddress");
+				
+				HttpSession session = request.getSession(true);
+				
+				try {
+					UserDAO userDAO = new UserDAO();
+					JSONObject responseObj = userDAO.newUserRegister(userName, password, email, phone, currentAddress);
+					//esponse.sendRedirect("Success");
+					
+					PrintWriter writer = response.getWriter();
+					writer.print("");
+					writer.close();
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+				
+				
+			}
+			else if(requestObject.getString("action").equalsIgnoreCase("userLogin")){
+				
+				String emailId = requestObject.getString("emailId");
+				String password = requestObject.getString("password");
+				try {
+					UserDAO userDAO = new UserDAO();
+					userDAO.userLogin(emailId, password);
+					//esponse.sendRedirect("Success");
+					
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+				
+			}	
+			
+			
+		}catch(JSONException e){
+			
+		}
+		
+		
+		
+		
+		
+
+	}
+}
+
