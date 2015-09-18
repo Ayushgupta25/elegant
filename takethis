@@ -1,0 +1,221 @@
+(function() {
+
+  "use strict";
+
+  var App = angular.module("tripMitra.controllers", ['ui.bootstrap']);
+
+  App.controller("MainPageController", function ($scope, $rootScope,UtilSrvc){
+
+	$scope.isUserLoggedInAlready = UtilSrvc.checkIfUserLoggedInAlready();
+
+	$scope.isUserAvailable = !($scope.isUserLoggedInAlready);
+	
+	$scope.userName = UtilSrvc.getCookie("userName");	
+    
+	$rootScope.$on('isLoginComplete', function(event, args) {
+		$scope.isUserLoggedInAlready = UtilSrvc.checkIfUserLoggedInAlready();
+
+		$scope.isUserAvailable = !($scope.isUserLoggedInAlready);
+		
+		$scope.userName = UtilSrvc.getCookie("userName");	
+	    
+	});
+	
+  });
+
+  App.controller("loginController",  function($scope,UtilSrvc,$rootScope){
+	
+	  $scope.firstName;
+	  $scope.lastName;
+	  $scope.inputEmail;
+	  $scope.inputPassword;
+	  
+	  $scope.signUpUser = function(){
+		  
+		  //makeLoginRequest
+		  var json = {
+		        	action:"newUserRegister",
+		        	password:$scope.inputPasswordSignup,
+		        	mail_id:$scope.inputEmailSignup,
+		        	firstName:$scope.firstName,
+		        	lastName:$scope.lastName
+		        };
+		  UtilSrvc.makeRequest('POST',json,function(resp){
+			  //if success
+			  console.log(resp)
+		//	  $scope.succesLogin();
+		  },function(resp){
+			  
+			  console.log(resp);
+		  });
+		  
+	  }
+
+	  $scope.makeLoginReq = function(){
+		  
+		  var json = {
+		        	action:"login",
+		        	password:$scope.inputPasswordLogin,
+		        	mail_id:$scope.inputEmailLogin,
+		        };
+		  
+		  console.log(json);
+		  
+		  UtilSrvc.makeRequest('POST',json,
+		  
+		  function(resp){
+			  //if success
+			  console.log(resp)
+			  $scope.succesLogin(resp);
+			  
+		  },function(resp){
+			  
+			  console.log(resp);
+		  });
+		  
+		  
+		 // $scope.succesLogin();
+		  
+	  }
+	  
+	  $scope.succesLogin = function(response){
+		  
+		  UtilSrvc.setCookie("userName",response[0].firstName,10);
+		  UtilSrvc.setCookie("emailId",response[0].mail_id,10);
+		  
+		  $('#loginModal').modal('hide');
+//		  UtilSrvc.setCookie("userName","Ayush",10);
+//		  UtilSrvc.setCookie("emailId","gupta9723@gmail.com",10);
+		  $rootScope.$emit('isLoginComplete');
+	  }
+	  
+	  
+  });
+  
+  App.controller("planNewTripController",function($scope,$compile){
+	  		
+	  	$scope.addFriends = function(){
+	  		if(!($scope.friendEmailId == undefined || $scope.friendEmailId == "")){
+	  			$('#friendList').prepend("<div class=\"friendNameAddSpan\">"+$scope.friendEmailId+" <i ng-click=\"removeFriend($event);\" class=\"glyphicon glyphicon-remove removeFriendClass\"></i></div>");
+	  			$compile($('#friendList'))($scope);
+	  			$scope.friendEmailId = "";
+	  		}
+	  		
+	  	}
+	  
+	  	$scope.removeFriend = function(elem){
+	  		$(elem.target).parent().remove();
+	  	}
+	  	
+	  	$scope.addPlaces = function(){
+	  		if(!($scope.placeToVisit == undefined || $scope.placeToVisit == "")){
+	  			$('#placeList').prepend("<div class=\"friendNameAddSpan\">"+$scope.friendEmailId+" <i ng-click=\"removeFriend($event);\" class=\"glyphicon glyphicon-remove removeFriendClass\"></i></div>");
+	  			$compile($('#placeList'))($scope);
+	  			$scope.placeToVisit = "";
+	  		}
+	  		
+	  	}
+	  	
+	  	$scope.states = ['gupta9723@gmail.com', 'ankitaurfrnd@gmail.com', 'atishayv@gmail.com', 'hadashubham@gmail.com', 'dungen_master@hotmail.com', 'mayankhastogi@gmail.com', 'maalhotmall@hotmail.com', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Dakota', 'North Carolina', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+	  	
+	  	
+	  	$scope.planTheTrip = function(){
+	  		
+	  		//console.log($scope.nameOfTrip);
+	  		
+	  		/*if($scope.nameOfTrip == undefined || $scope.nameOfTrip == ""){
+	  			alert("Please enter name of the trip.");
+	  			return;
+	  		}
+	  		else if($scope.fromDate== undefined || $scope.fromDate == ""){
+	  			alert("Please enter from date.");
+	  			return;
+	  		}
+	  		else if($scope.toDate== undefined || $scope.toDate == ""){
+	  			alert("Please enter to date.");
+	  			return;
+	  		}
+	  		
+	  		else if($('#friendList').children().length == 0 ){
+	  			alert("Atleast add one buddy to the trip.");
+	  			return;
+	  		}
+	  		*/
+	  		
+	  		
+	  		location.href = "#suggestionPage";
+	  		
+	  	}
+	  	
+	  	  $scope.today = function() {
+		    $scope.dt = new Date();
+		  };
+		  $scope.today();
+
+		  $scope.clear = function () {
+		    $scope.dt = null;
+		  };
+
+//		  // Disable weekend selection
+//		  $scope.disabled = function(date, mode) {
+//		    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+//		  };
+
+		  $scope.toggleMin = function() {
+		    $scope.minDate = $scope.minDate ? null : new Date();
+		  };
+		  $scope.toggleMin();
+		  $scope.maxDate = new Date(2020, 5, 22);
+
+		  $scope.open = function($event) {
+		    $scope.status.opened = true;
+		  };
+		  $scope.open1 = function($event) {
+			    $scope.status.opened1 = true;
+			  };
+
+		  $scope.dateOptions = {
+		    formatYear: 'yy',
+		    startingDay: 1
+		  };
+
+		  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+		  $scope.format = $scope.formats[0];
+
+		  $scope.status = {
+		    opened: false
+		  };
+
+		  var tomorrow = new Date();
+		  tomorrow.setDate(tomorrow.getDate() + 1);
+		  var afterTomorrow = new Date();
+		  afterTomorrow.setDate(tomorrow.getDate() + 2);
+		  $scope.events =
+		    [
+		      {
+		        date: tomorrow,
+		        status: 'full'
+		      },
+		      {
+		        date: afterTomorrow,
+		        status: 'partially'
+		      }
+		    ];
+
+		  $scope.getDayClass = function(date, mode) {
+		    if (mode === 'day') {
+		      var dayToCheck = new Date(date).setHours(0,0,0,0);
+
+		      for (var i=0;i<$scope.events.length;i++){
+		        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+
+		        if (dayToCheck === currentDay) {
+		          return $scope.events[i].status;
+		        }
+		      }
+		    }
+		  }
+  } );
+  
+
+}());
