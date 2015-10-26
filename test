@@ -1,173 +1,151 @@
-package dao;
+-- phpMyAdmin SQL Dump
+-- version 4.1.12
+-- http://www.phpmyadmin.net
+--
+-- Host: 192.168.21.194
+-- Generation Time: Oct 26, 2015 at 01:54 PM
+-- Server version: 5.6.16
+-- PHP Version: 5.5.11
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import utils.HibernateUtil;
-import bean.User;
-
-public class UserDAO {
-
-	public JSONObject newUserRegister(String userName, String password, String email,
-			String phone, String currentAddress) {
-		try {
-			
-			// 3. Get Session object
-			Session session = HibernateUtil.getSessionFactory().openSession();
-
-			// 4. Starting Transaction
-			Transaction transaction = session.beginTransaction();
-			
-			if(session.isConnected()){
-				User user = new User();
-				user.setUserName(userName);
-				user.setPassword(password);
-				user.setEmail(email);
-				user.setCurrentAddress(currentAddress);
-				user.setPhone(phone);
-				session.save(user);
-				transaction.commit();
-			}
-			
-			System.out.println("\n\n User registered successfully \n");
-			JSONObject responseObj = new JSONObject();
-			responseObj.put("RESPONSE_STATUS", "SUCCESS");
-			responseObj.put("RESPONSE_OBJECT", "SUCCESS");
-			return responseObj;
-		} catch (HibernateException e) {
-			System.out.println(e.getMessage());
-			System.out.println("error");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
-	public void userLogin(String emailId, String password){
-		try {
-			
-			Session session = HibernateUtil.getSessionFactory().openSession();
-			
-			
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
-}
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
 
+--
+-- Database: `localitydb`
+--
 
+-- --------------------------------------------------------
 
-package utils;
+--
+-- Table structure for table `comments_data`
+--
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+CREATE TABLE IF NOT EXISTS `comments_data` (
+  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `feed_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `post_time` varchar(255) DEFAULT NULL,
+  `likes` int(11) DEFAULT NULL,
+  `comment_text` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`comment_id`),
+  KEY `user_id` (`user_id`),
+  KEY `feed_id` (`feed_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-public class HibernateUtil {
-	public static SessionFactory getSessionFactory() {
-		// 1. configuring hibernate
-		Configuration configuration = new Configuration().configure();
+-- --------------------------------------------------------
 
-		// 2. create sessionfactory
-		SessionFactory sessionFactory = configuration.buildSessionFactory();
-		
-		return sessionFactory;
-	}
-}
+--
+-- Table structure for table `feeds_data`
+--
 
+CREATE TABLE IF NOT EXISTS `feeds_data` (
+  `feed_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `feed_title` varchar(255) DEFAULT NULL,
+  `feed_desc` varchar(255) DEFAULT NULL,
+  `feed_image` varchar(255) DEFAULT NULL,
+  `feed_image_comment` varchar(255) DEFAULT NULL,
+  `feed_link` varchar(255) DEFAULT NULL,
+  `post_time` varchar(255) DEFAULT NULL,
+  `likes` int(11) DEFAULT NULL,
+  `category` varchar(255) DEFAULT NULL,
+  `locality_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`feed_id`),
+  KEY `locality_id` (`locality_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
+--
+-- Dumping data for table `feeds_data`
+--
 
+INSERT INTO `feeds_data` (`feed_id`, `user_id`, `feed_title`, `feed_desc`, `feed_image`, `feed_image_comment`, `feed_link`, `post_time`, `likes`, `category`, `locality_id`) VALUES
+(2, 1, 'The awesome feed', 'This awesome hell of a description', '', '', '', '2 hours ago', 1, '', NULL),
+(3, 1, 'The awesome feed', 'This awesome hell of a description', '', '', '', '2 hours ago', 1, '', NULL),
+(4, 1, 'The awesome feed', 'This awesome hell of a description', '', '', '', '2 hours ago', 1, '', NULL),
+(5, 1, 'The awesome feed', 'This awesome hell of a description', '', '', '', '2 hours ago', 1, '', NULL);
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `locality_data`
+--
 
+CREATE TABLE IF NOT EXISTS `locality_data` (
+  `locality_id` int(11) NOT NULL AUTO_INCREMENT,
+  `profile_pic` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `area` text,
+  `address` varchar(500) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`locality_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `user_data`
+--
 
-package controller;
+CREATE TABLE IF NOT EXISTS `user_data` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `password` char(128) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `mail_id` varchar(320) NOT NULL,
+  `profile_pic` varchar(255) DEFAULT NULL,
+  `DOB` datetime DEFAULT NULL,
+  `school` varchar(255) DEFAULT NULL,
+  `college` varchar(255) DEFAULT NULL,
+  `workplace` varchar(255) DEFAULT NULL,
+  `gender` char(1) DEFAULT NULL,
+  `address` varchar(500) DEFAULT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `user_status` varchar(255) DEFAULT NULL,
+  `locality_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `mail_id` (`mail_id`),
+  KEY `locality_id` (`locality_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+--
+-- Dumping data for table `user_data`
+--
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+INSERT INTO `user_data` (`user_id`, `password`, `first_name`, `last_name`, `mail_id`, `profile_pic`, `DOB`, `school`, `college`, `workplace`, `gender`, `address`, `latitude`, `longitude`, `user_status`, `locality_id`) VALUES
+(1, 'ayush', 'ayush', NULL, 'ayush@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-import org.json.JSONException;
-import org.json.JSONObject;
+--
+-- Constraints for dumped tables
+--
 
-import sun.org.mozilla.javascript.internal.json.JsonParser;
-import dao.UserDAO;
+--
+-- Constraints for table `comments_data`
+--
+ALTER TABLE `comments_data`
+  ADD CONSTRAINT `comments_data_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_data` (`user_id`),
+  ADD CONSTRAINT `comments_data_ibfk_2` FOREIGN KEY (`feed_id`) REFERENCES `feeds_data` (`feed_id`);
 
-public class MainControllerServlet {
-	
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+--
+-- Constraints for table `feeds_data`
+--
+ALTER TABLE `feeds_data`
+  ADD CONSTRAINT `feeds_data_ibfk_1` FOREIGN KEY (`locality_id`) REFERENCES `locality_data` (`locality_id`),
+  ADD CONSTRAINT `feeds_data_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_data` (`user_id`);
 
-		try{
-			
-			JSONObject requestObject = new JSONObject(request.getParameter("requestObject"));
-			
-			if(requestObject.getString("action").equalsIgnoreCase("newUserRegister")){
-				
-				String userName = requestObject.getString("userName");
-				String password = requestObject.getString("password");
-				String email = requestObject.getString("email");
-				String phone = requestObject.getString("phone");
-				String currentAddress = requestObject.getString("currentAddress");
-				
-				HttpSession session = request.getSession(true);
-				
-				try {
-					UserDAO userDAO = new UserDAO();
-					JSONObject responseObj = userDAO.newUserRegister(userName, password, email, phone, currentAddress);
-					//esponse.sendRedirect("Success");
-					
-					PrintWriter writer = response.getWriter();
-					writer.print("");
-					writer.close();
-				} catch (Exception e) {
+--
+-- Constraints for table `user_data`
+--
+ALTER TABLE `user_data`
+  ADD CONSTRAINT `user_data_ibfk_1` FOREIGN KEY (`locality_id`) REFERENCES `locality_data` (`locality_id`);
 
-					e.printStackTrace();
-				}
-				
-				
-			}
-			else if(requestObject.getString("action").equalsIgnoreCase("userLogin")){
-				
-				String emailId = requestObject.getString("emailId");
-				String password = requestObject.getString("password");
-				try {
-					UserDAO userDAO = new UserDAO();
-					userDAO.userLogin(emailId, password);
-					//esponse.sendRedirect("Success");
-					
-				} catch (Exception e) {
-
-					e.printStackTrace();
-				}
-				
-			}	
-			
-			
-		}catch(JSONException e){
-			
-		}
-		
-		
-		
-		
-		
-
-	}
-}
-
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
